@@ -43,7 +43,7 @@
  * A URL fica disponível após publicar o Apps Script como Web App.
  * Formato: https://script.google.com/macros/s/SEU_CODIGO_AQUI/exec
  */
-const API_URL = "https://script.google.com/macros/s/SEU_CODIGO_AQUI/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbytOQyvuRNzgSlh13uKndYs2Td2PW344KvzdP4yO5rK6BEFQZ1QtRtWdvguyt622GqA/exec";
 
 /**
  * Chave usada no localStorage para guardar o token JWT.

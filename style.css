@@ -1,0 +1,874 @@
+/*
+  ============================================================================
+  STYLE.CSS - FOLHA DE ESTILOS DO APP GOVRJ
+  ============================================================================
+
+  O QUE É ESTE ARQUIVO:
+  Este arquivo contém TODAS as regras de estilo (cores, tamanhos, posições,
+  animações) do app. É como a "pintura e decoração" da casa (HTML é a estrutura).
+
+  ARQUITETURA CSS:
+  - Usamos CSS puro (sem frameworks como Bootstrap ou Tailwind)
+  - Variáveis CSS (:root) para cores e valores reutilizáveis
+  - Mobile-first: estilos base para celular, depois ajustamos para desktop
+  - BEM-like naming: nomes descritivos que indicam função
+
+  COMO FUNCIONA:
+  O navegador lê este arquivo e aplica as regras aos elementos HTML.
+  Ex: "body { background: #f5f5f5; }" diz que o fundo da página é cinza claro.
+  ============================================================================
+*/
+
+
+/* =============================================================================
+   SEÇÃO 1: VARIÁVEIS CSS (CUSTOM PROPERTIES)
+   =============================================================================
+   :root define variáveis globais que podem ser usadas em qualquer lugar.
+   Se quiser mudar a cor principal, muda aqui e muda em todo o app automaticamente.
+
+   Vantagem: centraliza configurações visuais em um só lugar.
+*/
+:root {
+  /* CORES PRINCIPAIS */
+  --cor-primaria: #1a1a2e;        /* Azul escuro institucional (cabeçalhos, botões) */
+  --cor-primaria-clara: #16213e;  /* Variante mais clara para hover */
+  --cor-acento: #0f3460;          /* Azul médio para destaques */
+  --cor-sucesso: #28a745;         /* Verde para mensagens de sucesso */
+  --cor-erro: #dc3545;            /* Vermelho para mensagens de erro */
+  --cor-aviso: #ffc107;           /* Amarelo para alertas */
+  --cor-info: #17a2b8;            /* Azul claro para informações */
+
+  /* CORES NEUTRAS (escala de cinza) */
+  --cor-fundo: #f8f9fa;           /* Fundo da página (cinza bem claro) */
+  --cor-fundo-card: #ffffff;      /* Fundo dos cartões (branco puro) */
+  --cor-texto: #212529;           /* Texto principal (quase preto) */
+  --cor-texto-fraco: #6c757d;     /* Texto secundário (cinza médio) */
+  --cor-borda: #dee2e6;           /* Bordas sutis (cinza claro) */
+  --cor-borda-foco: #1a1a2e;      /* Borda quando campo está focado */
+
+  /* ESPAÇAMENTO (escala de 4px) */
+  --espaco-xs: 4px;   /* Extra pequeno */
+  --espaco-sm: 8px;   /* Pequeno */
+  --espaco-md: 16px;  /* Médio (padrão) */
+  --espaco-lg: 24px;  /* Grande */
+  --espaco-xl: 32px;  /* Extra grande */
+
+  /* TIPOGRAFIA */
+  --fonte-principal: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fonte-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+
+  /* BORDAS ARREDONDADAS */
+  --raio-sm: 6px;   /* Botões pequenos, tags */
+  --raio-md: 10px;  /* Inputs, cards */
+  --raio-lg: 16px;  /* Container principal */
+
+  /* SOMBRAS */
+  --sombra-card: 0 2px 8px rgba(0, 0, 0, 0.08);   /* Sombra suave dos cartões */
+  --sombra-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12); /* Sombra ao passar o mouse */
+  --sombra-toast: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra das notificações */
+
+  /* TRANSIÇÕES (animações suaves) */
+  --transicao-rapida: 0.15s ease;   /* Hover de botões */
+  --transicao-media: 0.25s ease;    /* Troca de telas */
+  --transicao-lenta: 0.4s ease;     /* Animações maiores */
+}
+
+
+/* =============================================================================
+   SEÇÃO 2: RESET E ESTILOS BASE
+   =============================================================================
+   O "reset" zera estilos padrão do navegador para ter controle total.
+   Cada navegador (Chrome, Firefox, Safari) tem estilos padrão diferentes.
+   O reset garante que todos comecem do mesmo ponto.
+*/
+
+/*
+  * (asterisco) = "todos os elementos".
+  box-sizing: border-box faz com que padding e borda NÃO aumentem o tamanho total.
+  Ex: uma div com width: 100px + padding: 10px = 100px (não 120px).
+  Isso facilita MUITO o layout.
+*/
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+  html: define o tamanho base da fonte (16px = 1rem).
+  scroll-behavior: smooth faz scrolls animados (quando navega por âncoras).
+*/
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+/*
+  body: estilos da página inteira.
+  - font-family: usa a fonte definida nas variáveis
+  - background: cor de fundo da página
+  - color: cor padrão do texto
+  - line-height: espaçamento entre linhas (1.5 = 150% do tamanho da fonte)
+  - min-height: garante que o body ocupe pelo menos 100% da altura da tela
+  - -webkit-font-smoothing: deixa a fonte mais nítida no Mac/Chrome
+*/
+body {
+  font-family: var(--fonte-principal);
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+  img, svg: faz imagens serem "blocos" em vez de "inline".
+  Isso evita espaços estranhos abaixo de imagens.
+  max-width: 100% faz imagens nunca ultrapassarem o container.
+*/
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/*
+  input, button, textarea, select: herdam a fonte do body.
+  Por padrão, formulários usam fonte do sistema, não a nossa.
+*/
+input, button, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/*
+  a (links): remove o sublinhado padrão e herda a cor do texto.
+  text-decoration: none tira o sublinhado.
+  color: inherit pega a cor do elemento pai.
+*/
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+/* =============================================================================
+   SEÇÃO 3: SISTEMA DE TELAS (VISIBILIDADE)
+   =============================================================================
+   Temos 4 telas (divs) que ocupam a tela inteira.
+   Só UMA pode estar visível por vez.
+   O JavaScript adiciona/remove a classe "ativa" para controlar.
+*/
+
+/*
+  .tela: estilo base de TODAS as telas.
+  - position: fixed: fixa na tela (não rola com a página)
+  - top/left: 0: começa no canto superior esquerdo
+  - width/height: 100%: ocupa TODA a tela
+  - display: flex + align-items: center + justify-content: center:
+    centraliza o conteúdo vertical e horizontalmente
+  - opacity: 0: começa invisível
+  - visibility: hidden: impede cliques quando invisível
+  - transition: anima a mudança de opacity e visibility
+  - z-index: -1: fica ATRÁS das outras telas
+*/
+.tela {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--espaco-md);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transicao-media), visibility var(--transicao-media);
+  z-index: -1;
+  overflow-y: auto; /* Permite rolar se o conteúdo for maior que a tela */
+}
+
+/*
+  .tela.ativa: tela que está VISÍVEL no momento.
+  - opacity: 1: totalmente visível
+  - visibility: visible: permite cliques
+  - z-index: 1: fica NA FRENTE das outras telas
+*/
+.tela.ativa {
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+
+
+/* =============================================================================
+   SEÇÃO 4: LAYOUT DO CONTAINER E LOGO
+   =============================================================================
+*/
+
+/*
+  .container: caixa central que limita a largura máxima.
+  - width: 100%: ocupa toda a largura disponível
+  - max-width: 420px: mas NUNCA ultrapassa 420px (fica bonito no desktop)
+  - margin: auto: centraliza horizontalmente
+*/
+.container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/*
+  .logo: área do brasão/ícone e título.
+  - text-align: center: centraliza todo o texto
+  - margin-bottom: espaço abaixo do logo
+*/
+.logo {
+  text-align: center;
+  margin-bottom: var(--espaco-lg);
+}
+
+/*
+  .logo-icon: o emoji/ícone grande do logo.
+  - font-size: 56px: emoji bem grande
+  - margin-bottom: espaço entre ícone e título
+*/
+.logo-icon {
+  font-size: 56px;
+  margin-bottom: var(--espaco-sm);
+  line-height: 1;
+}
+
+/*
+  .logo-title: título principal "GovRJ".
+  - font-size: 28px: tamanho grande
+  - font-weight: 700: negrito forte
+  - color: usa a cor primária institucional
+  - letter-spacing: 1px: espaço entre letras (mais elegante)
+*/
+.logo-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cor-primaria);
+  letter-spacing: 1px;
+  margin-bottom: var(--espaco-xs);
+}
+
+/*
+  .logo-subtitle: texto abaixo do título.
+  - font-size: 14px: tamanho menor
+  - color: usa cor de texto fraco (cinza)
+*/
+.logo-subtitle {
+  font-size: 14px;
+  color: var(--cor-texto-fraco);
+}
+
+
+/* =============================================================================
+   SEÇÃO 5: CARTÃO (CARD) - CAIXA BRANCA DO FORMULÁRIO
+   =============================================================================
+*/
+
+/*
+  .card: caixa branca com bordas arredondadas e sombra.
+  - background: branco puro
+  - border-radius: bordas arredondadas (10px)
+  - box-shadow: sombra suave para dar profundidade
+  - padding: espaço interno (24px nas laterais, 32px em cima/baixo)
+*/
+.card {
+  background-color: var(--cor-fundo-card);
+  border-radius: var(--raio-md);
+  box-shadow: var(--sombra-card);
+  padding: var(--espaco-xl) var(--espaco-lg);
+  transition: box-shadow var(--transicao-rapida);
+}
+
+/*
+  .card:hover: quando o mouse passa por cima do cartão.
+  Aumenta a sombra levemente (efeito de "elevação").
+*/
+.card:hover {
+  box-shadow: var(--sombra-card-hover);
+}
+
+/*
+  .card-title: título dentro do cartão (ex: "Acesse sua conta").
+*/
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--cor-texto);
+  margin-bottom: var(--espaco-lg);
+  text-align: center;
+}
+
+
+/* =============================================================================
+   SEÇÃO 6: FORMULÁRIOS - CAMPOS, LABELS, INPUTS
+   =============================================================================
+*/
+
+/*
+  .form-group: envolve cada campo do formulário (label + input + erro).
+  - margin-bottom: espaço entre um campo e o próximo
+*/
+.form-group {
+  margin-bottom: var(--espaco-md);
+}
+
+/*
+  .form-label: texto descritivo acima do campo (ex: "Email institucional").
+  - display: block: ocupa a linha inteira (fica acima do input)
+  - font-size: 14px
+  - font-weight: 500: semi-negrito
+  - margin-bottom: espaço entre label e input
+  - color: cor de texto principal
+*/
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: var(--espaco-sm);
+  color: var(--cor-texto);
+}
+
+/*
+  .form-input: estilo dos campos de texto (input[type="email"], etc).
+  - width: 100%: ocupa toda a largura do container
+  - padding: espaço interno (12px vertical, 14px horizontal)
+  - border: borda cinza clara de 1px
+  - border-radius: bordas arredondadas (10px)
+  - background: fundo branco
+  - transition: anima mudanças de cor/borda
+  - outline: none: remove o contorno azul padrão do navegador
+*/
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  background-color: var(--cor-fundo-card);
+  color: var(--cor-texto);
+  font-size: 15px;
+  transition: border-color var(--transicao-rapida), box-shadow var(--transicao-rapida);
+  outline: none;
+}
+
+/*
+  .form-input::placeholder: estilo do texto placeholder (ex: "seu.email@gov.rj").
+  - color: cinza claro
+*/
+.form-input::placeholder {
+  color: #adb5bd;
+}
+
+/*
+  .form-input:focus: quando o usuário clica no campo (foco).
+  - border-color: muda para a cor primária (azul escuro)
+  - box-shadow: adiciona um brilho sutil azul ao redor do campo
+*/
+.form-input:focus {
+  border-color: var(--cor-borda-foco);
+  box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
+}
+
+/*
+  .form-input.erro: quando há erro de validação no campo.
+  - border-color: vermelho
+  - background: fundo levemente rosado
+*/
+.form-input.erro {
+  border-color: var(--cor-erro);
+  background-color: #fff5f5;
+}
+
+/*
+  .error-msg: mensagem de erro abaixo do campo.
+  - display: none: começa escondida
+  - color: vermelho
+  - font-size: 12px
+  - margin-top: espaço entre input e mensagem de erro
+*/
+.error-msg {
+  display: none;
+  color: var(--cor-erro);
+  font-size: 12px;
+  margin-top: var(--espaco-xs);
+}
+
+/*
+  .error-msg.visivel: classe adicionada pelo JavaScript para MOSTRAR a mensagem.
+*/
+.error-msg.visivel {
+  display: block;
+}
+
+/*
+  .hint: dica/caption abaixo do campo (cinza, não é erro).
+  - color: cinza médio
+  - font-size: 12px
+*/
+.hint {
+  display: block;
+  color: var(--cor-texto-fraco);
+  font-size: 12px;
+  margin-top: var(--espaco-xs);
+}
+
+
+/* =============================================================================
+   SEÇÃO 7: OPÇÕES DO FORMULÁRIO (LEMBRAR-ME + ESQUECI SENHA)
+   =============================================================================
+*/
+
+/*
+  .form-options: linha com checkbox e link lado a lado.
+  - display: flex: alinha itens horizontalmente
+  - justify-content: space-between: empurra um para cada lado
+  - align-items: center: alinha verticalmente no centro
+  - margin: espaço acima e abaixo
+*/
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--espaco-md) 0;
+}
+
+/*
+  .checkbox-label: envolve o input checkbox + texto.
+  - display: flex: alinha checkbox e texto lado a lado
+  - align-items: center: centraliza verticalmente
+  - cursor: pointer: muda o cursor para mãozinha
+  - font-size: 14px
+*/
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--cor-texto-fraco);
+}
+
+/*
+  .checkbox-label input[type="checkbox"]: estilo do checkbox.
+  - margin-right: espaço entre checkbox e texto
+  - width/height: 16px (tamanho padrão)
+  - cursor: pointer
+  - accent-color: cor do checkbox quando marcado (azul escuro)
+*/
+.checkbox-label input[type="checkbox"] {
+  margin-right: var(--espaco-sm);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--cor-primaria);
+}
+
+/*
+  .link: estilo dos links ("Esqueci minha senha", "Voltar para o login").
+  - color: azul escuro
+  - font-size: 14px
+  - font-weight: 500
+  - transition: anima a mudança de cor
+*/
+.link {
+  color: var(--cor-primaria);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color var(--transicao-rapida);
+}
+
+/*
+  .link:hover: quando o mouse passa por cima do link.
+  - color: fica mais claro (azul médio)
+  - text-decoration: underline: adiciona sublinhado
+*/
+.link:hover {
+  color: var(--cor-acento);
+  text-decoration: underline;
+}
+
+/*
+  .form-footer: área de rodapé do formulário (link de voltar).
+  - text-align: center: centraliza o conteúdo
+  - margin-top: espaço acima
+*/
+.form-footer {
+  text-align: center;
+  margin-top: var(--espaco-lg);
+  padding-top: var(--espaco-md);
+  border-top: 1px solid var(--cor-borda);
+}
+
+
+/* =============================================================================
+   SEÇÃO 8: BOTÕES
+   =============================================================================
+*/
+
+/*
+  .btn: estilo base de TODOS os botões.
+  - width: 100%: ocupa toda a largura do container
+  - padding: espaço interno (14px vertical)
+  - border: remove borda padrão
+  - border-radius: bordas arredondadas (10px)
+  - font-size: 16px
+  - font-weight: 600: semi-negrito
+  - cursor: pointer: mão ao passar o mouse
+  - transition: anima mudanças de cor/fundo/sombra
+  - outline: none: remove contorno padrão
+  - position: relative: necessário para o efeito de ripple (futuro)
+*/
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--raio-md);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transicao-rapida), 
+              transform var(--transicao-rapida), 
+              box-shadow var(--transicao-rapida);
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/*
+  .btn:active: quando o usuário CLICA no botão (pressiona).
+  - transform: scale(0.98): encolhe levemente (efeito de "apertar")
+*/
+.btn:active {
+  transform: scale(0.98);
+}
+
+/*
+  .btn-primary: botão principal (azul escuro).
+  - background: azul escuro
+  - color: texto branco
+*/
+.btn-primary {
+  background-color: var(--cor-primaria);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(26, 26, 46, 0.2);
+}
+
+/*
+  .btn-primary:hover: mouse sobre o botão principal.
+  - background: azul um pouco mais claro
+  - box-shadow: sombra mais intensa
+*/
+.btn-primary:hover {
+  background-color: var(--cor-primaria-clara);
+  box-shadow: 0 4px 8px rgba(26, 26, 46, 0.3);
+}
+
+/*
+  .btn-primary:disabled: botão desabilitado (durante carregamento).
+  - opacity: 0.7: fica mais transparente
+  - cursor: not-allowed: cursor de "proibido"
+  - transform: none: remove o efeito de pressão
+*/
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/*
+  .btn-loading: texto do spinner (inicialmente escondido).
+  - display: flex: alinha spinner e texto
+  - align-items: center: centraliza verticalmente
+  - justify-content: center: centraliza horizontalmente
+  - gap: espaço entre spinner e texto
+*/
+.btn-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-sm);
+}
+
+
+/* =============================================================================
+   SEÇÃO 9: SPINNER (ANIMAÇÃO DE CARREGAMENTO)
+   =============================================================================
+*/
+
+/*
+  .spinner: círculo que gira infinitamente.
+  - width/height: 18px (tamanho pequeno)
+  - border: borda cinza clara de 2px
+  - border-top-color: borda superior azul (a única parte visível quando gira)
+  - border-radius: 50%: transforma em círculo perfeito
+  - animation: spin 0.8s linear infinite: gira infinitamente
+*/
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/*
+  @keyframes spin: define a animação de rotação.
+  - from { transform: rotate(0deg) }: começa em 0 graus
+  - to { transform: rotate(360deg) }: vai até 360 graus (volta completa)
+*/
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
+/* =============================================================================
+   SEÇÃO 10: ALERTAS (CAIXAS DE AVISO)
+   =============================================================================
+*/
+
+/*
+  .alert: estilo base de todas as caixas de aviso.
+  - padding: espaço interno
+  - border-radius: bordas arredondadas (6px)
+  - margin-bottom: espaço abaixo
+  - font-size: 14px
+  - border-left: borda grossa na esquerda (4px) para destacar
+*/
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--raio-sm);
+  margin-bottom: var(--espaco-md);
+  font-size: 14px;
+  line-height: 1.5;
+  border-left: 4px solid transparent;
+}
+
+/*
+  .alert-warning: alerta amarelo (atenção).
+  - background: amarelo bem claro
+  - border-left-color: amarelo
+  - color: marrom escuro (melhor contraste que amarelo puro)
+*/
+.alert-warning {
+  background-color: #fffbeb;
+  border-left-color: var(--cor-aviso);
+  color: #92400e;
+}
+
+/*
+  .alert-info: alerta azul (informação).
+*/
+.alert-info {
+  background-color: #eff6ff;
+  border-left-color: var(--cor-info);
+  color: #1e40af;
+}
+
+/*
+  .alert-success: alerta verde (sucesso).
+*/
+.alert-success {
+  background-color: #f0fdf4;
+  border-left-color: var(--cor-sucesso);
+  color: #166534;
+}
+
+/*
+  .alert-error: alerta vermelho (erro).
+*/
+.alert-error {
+  background-color: #fef2f2;
+  border-left-color: var(--cor-erro);
+  color: #991b1b;
+}
+
+
+/* =============================================================================
+   SEÇÃO 11: TOAST (NOTIFICAÇÃO FLUTUANTE)
+   =============================================================================
+*/
+
+/*
+  .toast: caixa de notificação que aparece no topo da tela.
+  - position: fixed: fixa na tela
+  - top: 20px: 20px do topo
+  - left/right: 20px: 20px das laterais
+  - z-index: 9999: fica NA FRENTE de TUDO
+  - padding: espaço interno
+  - border-radius: bordas arredondadas
+  - box-shadow: sombra forte para destacar
+  - text-align: center
+  - transition: anima entrada/saída
+  - transform: translateY(-100px): começa 100px ACIMA da tela (invisível)
+*/
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 9999;
+  padding: 14px 20px;
+  border-radius: var(--raio-md);
+  box-shadow: var(--sombra-toast);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform var(--transicao-media), opacity var(--transicao-media);
+  transform: translateY(-100px);
+  opacity: 0;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/*
+  .toast.visivel: toast que está aparecendo na tela.
+  - transform: translateY(0): posição normal (visível)
+  - opacity: 1: totalmente visível
+*/
+.toast.visivel {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/*
+  .toast.sucesso: toast verde (mensagem de sucesso).
+*/
+.toast.sucesso {
+  background-color: var(--cor-sucesso);
+  color: #ffffff;
+}
+
+/*
+  .toast.erro: toast vermelho (mensagem de erro).
+*/
+.toast.erro {
+  background-color: var(--cor-erro);
+  color: #ffffff;
+}
+
+
+/* =============================================================================
+   SEÇÃO 12: RODAPÉ
+   =============================================================================
+*/
+
+/*
+  .footer: rodapé da página.
+  - text-align: center
+  - margin-top: espaço acima
+  - color: cinza
+  - font-size: 13px
+*/
+.footer {
+  text-align: center;
+  margin-top: var(--espaco-xl);
+  color: var(--cor-texto-fraco);
+  font-size: 13px;
+}
+
+/*
+  .footer-small: texto menor dentro do rodapé.
+*/
+.footer-small {
+  font-size: 12px;
+  margin-top: var(--espaco-xs);
+  opacity: 0.8;
+}
+
+
+/* =============================================================================
+   SEÇÃO 13: RESPONSIVIDADE (MEDIA QUERIES)
+   =============================================================================
+   Media queries ajustam o layout para telas maiores (desktop).
+   O padrão é mobile-first (estilos base para celular).
+   Aqui sobrescrevemos alguns valores para telas maiores.
+*/
+
+/*
+  @media (min-width: 768px): quando a tela tem PELO MENOS 768px de largura.
+  Isso cobre tablets e desktops.
+*/
+@media (min-width: 768px) {
+  /*
+    Aumenta o tamanho do logo em telas grandes.
+  */
+  .logo-icon {
+    font-size: 64px;
+  }
+
+  .logo-title {
+    font-size: 32px;
+  }
+
+  /*
+    Aumenta o padding do cartão em telas grandes.
+  */
+  .card {
+    padding: 40px 32px;
+  }
+
+  /*
+    Aumenta o tamanho da fonte dos inputs.
+  */
+  .form-input {
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+}
+
+
+/* =============================================================================
+   SEÇÃO 14: ANIMAÇÕES ADICIONAIS
+   =============================================================================
+*/
+
+/*
+  @keyframes fadeIn: animação de aparecer suavemente.
+  - from { opacity: 0; transform: translateY(10px); }: começa invisível e 10px abaixo
+  - to { opacity: 1; transform: translateY(0); }: termina visível na posição normal
+*/
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+  .fade-in: classe que aplica a animação fadeIn.
+  - animation: fadeIn 0.4s ease: dura 0.4 segundos, suave
+*/
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+/*
+  @keyframes shake: animação de "tremida" para erros.
+  Usada quando o usuário tenta enviar com campos inválidos.
+*/
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/*
+  .shake: aplica a animação de tremida.
+*/
+.shake {
+  animation: shake 0.4s ease;
+}

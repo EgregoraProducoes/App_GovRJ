@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  INDEX.HTML - PÁGINA DE LOGIN DO APP GOVRJ
+  ============================================================================
+
+  O QUE É ESTE ARQUIVO:
+  Este é a página principal do app. É a PRIMEIRA tela que o usuário vê.
+  Ela contém o formulário de login, o formulário de recuperação de senha
+  e a tela de troca de senha no primeiro acesso.
+
+  ARQUITETURA:
+  - É um arquivo HTML5 puro (sem frameworks como React ou Vue)
+  - Usa CSS externo (style.css) para estilos
+  - Usa JavaScript externo (app.js) para lógica
+  - Comunica com o Google Apps Script via requisições HTTPS (fetch API)
+
+  COMO USAR:
+  1. Coloque este arquivo na raiz do seu repositório GitHub
+  2. Configure o GitHub Pages para servir a pasta raiz
+  3. O arquivo carrega style.css e app.js automaticamente
+  ============================================================================
+-->
+<html lang="pt-BR">
+<head>
+  <!--
+    =============================================================================
+    SEÇÃO: <head> - CONFIGURAÇÕES DA PÁGINA
+    =============================================================================
+    O <head> contém metadados (informações SOBRE a página, não visíveis).
+    É como a "ficha técnica" do documento.
+  -->
+
+  <!-- charset: define a codificação de caracteres. UTF-8 suporta acentos (á, é, ç) -->
+  <meta charset="UTF-8">
+
+  <!-- viewport: faz a página se adaptar a celulares/tablets (responsivo) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- title: texto que aparece na aba do navegador -->
+  <title>GovRJ - Sistema de Gestão</title>
+
+  <!--
+    Link para o arquivo CSS externo.
+    rel="stylesheet" diz que é um arquivo de estilos.
+    href="style.css" é o caminho do arquivo (mesma pasta que o HTML).
+  -->
+  <link rel="stylesheet" href="style.css">
+
+  <!--
+    Favicon: ícone pequeno que aparece na aba do navegador.
+    Usamos um emoji como ícone via data URI (não precisa de arquivo externo).
+  -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+</head>
+
+<body>
+  <!--
+    =============================================================================
+    SEÇÃO: <body> - CONTEÚDO VISÍVEL DA PÁGINA
+    =============================================================================
+    Tudo que está aqui será exibido na tela do usuário.
+
+    ESTRUTURA DAS TELAS:
+    Temos 3 "telas" (divs) que ocupam a tela inteira, mas só UMA é visível
+    por vez. O JavaScript controla qual está visível.
+
+    1. #tela-login: Tela de login normal (email + senha)
+    2. #tela-recuperar: Tela de recuperação de senha (só email)
+    3. #tela-trocar-senha: Tela de troca de senha (1º acesso ou troca voluntária)
+  -->
+
+  <!-- ========================================================================== -->
+  <!-- TELA 1: LOGIN -->
+  <!-- ========================================================================== -->
+  <!--
+    id="tela-login": identificador único para o JavaScript encontrar esta div.
+    class="tela ativa": classes CSS. "tela" define estilos base. "ativa" faz
+    ela ficar visível (outras telas não terão "ativa" inicialmente).
+  -->
+  <div id="tela-login" class="tela ativa">
+
+    <!--
+      .container: caixa central que agrupa todo o conteúdo da tela.
+      Limita a largura máxima e centraliza na tela.
+    -->
+    <div class="container">
+
+      <!--
+        .logo: área do brasão/ícone e título do sistema.
+        Usamos um emoji como logo temporário (você pode trocar por uma imagem).
+      -->
+      <div class="logo">
+        <div class="logo-icon">🏛️</div>
+        <h1 class="logo-title">GovRJ</h1>
+        <p class="logo-subtitle">Sistema de Gestão de Secretarias</p>
+      </div>
+
+      <!--
+        .card: caixa branca com bordas arredondadas que envolve o formulário.
+        Dá a aparência de "cartão" ou "painel" moderno.
+      -->
+      <div class="card">
+
+        <!-- Título do formulário -->
+        <h2 class="card-title">Acesse sua conta</h2>
+
+        <!--
+          FORMULÁRIO DE LOGIN
+          id="form-login": identificador para o JavaScript capturar o evento de submit.
+          novalidate: desativa a validação automática do navegador (fazemos nossa própria).
+        -->
+        <form id="form-login" novalidate>
+
+          <!--
+            GRUPO DE CAMPO: EMAIL
+            .form-group: envolve o label + input + mensagem de erro.
+            Cada campo segue este mesmo padrão visual.
+          -->
+          <div class="form-group">
+            <!--
+              <label>: texto descritivo acima do campo.
+              for="login-email": associa este label ao input com id="login-email".
+              Isso melhora a acessibilidade (leitores de tela) e usabilidade
+              (clicar no label foca o input).
+            -->
+            <label for="login-email" class="form-label">Email institucional</label>
+            <!--
+              <input>: campo de texto onde o usuário digita.
+              type="email": teclado de celular mostra @ e .com automaticamente.
+              id="login-email": identificador para o JavaScript ler o valor.
+              class="form-input": estilos visuais do campo.
+              placeholder="seu.email@gov.rj": texto cinza de exemplo dentro do campo.
+              required: campo obrigatório (usado pela nossa validação JS).
+              autocomplete="email": navegador pode sugerir emails salvos.
+            -->
+            <input 
+              type="email" 
+              id="login-email" 
+              class="form-input" 
+              placeholder="seu.email@gov.rj"
+              required
+              autocomplete="email"
+            >
+            <!--
+              .error-msg: mensagem de erro (inicialmente escondida).
+              O JavaScript mostra esta mensagem se a validação falhar.
+            -->
+            <span class="error-msg" id="erro-email">Por favor, insira um email válido</span>
+          </div>
+
+          <!-- GRUPO DE CAMPO: SENHA -->
+          <div class="form-group">
+            <label for="login-senha" class="form-label">Senha</label>
+            <!-- type="password": esconde os caracteres digitados (mostra •••) -->
+            <input 
+              type="password" 
+              id="login-senha" 
+              class="form-input" 
+              placeholder="Digite sua senha"
+              required
+              autocomplete="current-password"
+            >
+            <span class="error-msg" id="erro-senha">Senha é obrigatória</span>
+          </div>
+
+          <!--
+            .form-options: linha com "lembrar-me" e "esqueci senha".
+            display: flex (CSS) alinha os itens lado a lado.
+          -->
+          <div class="form-options">
+            <!--
+              Checkbox "Lembrar-me": se marcado, o JavaScript salva o email
+              no localStorage para preencher automaticamente na próxima vez.
+            -->
+            <label class="checkbox-label">
+              <input type="checkbox" id="lembrar-email">
+              <span class="checkbox-text">Lembrar email</span>
+            </label>
+            <!--
+              Link "Esqueci minha senha": não é um link de verdade (href="#").
+              O JavaScript intercepta o clique e mostra a tela de recuperação.
+            -->
+            <a href="#" class="link" id="link-recuperar">Esqueci minha senha</a>
+          </div>
+
+          <!--
+            BOTÃO DE ENTRAR
+            type="submit": quando clicado, dispara o evento "submit" do formulário.
+            O JavaScript captura este evento e envia os dados para o Apps Script.
+          -->
+          <button type="submit" class="btn btn-primary" id="btn-entrar">
+            <!--
+              .btn-text: texto normal do botão.
+              .btn-loading: spinner de carregamento (inicialmente escondido).
+              O JavaScript alterna entre eles durante o processamento.
+            -->
+            <span class="btn-text">Entrar</span>
+            <span class="btn-loading" style="display:none;">
+              <!-- Spinner CSS animado (ver style.css) -->
+              <span class="spinner"></span> Entrando...
+            </span>
+          </button>
+
+        </form> <!-- Fim do formulário de login -->
+
+      </div> <!-- Fim do .card -->
+
+      <!--
+        .footer: rodapé da página com informações institucionais.
+      -->
+      <div class="footer">
+        <p>© 2026 Governo do Estado do Rio de Janeiro</p>
+        <p class="footer-small">Sistema interno - Acesso restrito a servidores autorizados</p>
+      </div>
+
+    </div> <!-- Fim do .container -->
+  </div> <!-- Fim da #tela-login -->
+
+
+  <!-- ========================================================================== -->
+  <!-- TELA 2: RECUPERAÇÃO DE SENHA -->
+  <!-- ========================================================================== -->
+  <!--
+    id="tela-recuperar": tela de recuperação de senha.
+    NÃO tem a classe "ativa", então começa INVISÍVEL.
+    O JavaScript adiciona "ativa" quando o usuário clica em "Esqueci minha senha".
+  -->
+  <div id="tela-recuperar" class="tela">
+    <div class="container">
+      <div class="logo">
+        <div class="logo-icon">🔐</div>
+        <h1 class="logo-title">Recuperar Senha</h1>
+        <p class="logo-subtitle">Informe seu email para receber uma nova senha provisória</p>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Recuperação de acesso</h2>
+
+        <form id="form-recuperar" novalidate>
+          <div class="form-group">
+            <label for="recuperar-email" class="form-label">Email cadastrado</label>
+            <input 
+              type="email" 
+              id="recuperar-email" 
+              class="form-input" 
+              placeholder="seu.email@gov.rj"
+              required
+              autocomplete="email"
+            >
+            <span class="error-msg" id="erro-recuperar-email">Email inválido</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-recuperar">
+            <span class="btn-text">Enviar nova senha</span>
+            <span class="btn-loading" style="display:none;">
+              <span class="spinner"></span> Enviando...
+            </span>
+          </button>
+
+          <!--
+            .form-footer: link para voltar à tela de login.
+          -->
+          <div class="form-footer">
+            <a href="#" class="link" id="link-voltar-login">← Voltar para o login</a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div> <!-- Fim da #tela-recuperar -->
+
+
+  <!-- ========================================================================== -->
+  <!-- TELA 3: TROCA DE SENHA (PRIMEIRO ACESSO) -->
+  <!-- ========================================================================== -->
+  <!--
+    id="tela-trocar-senha": tela onde o usuário cria sua senha definitiva.
+    Aparece automaticamente quando o usuário faz login com senha provisória.
+    Também pode ser usada para troca voluntária de senha.
+  -->
+  <div id="tela-trocar-senha" class="tela">
+    <div class="container">
+      <div class="logo">
+        <div class="logo-icon">🔑</div>
+        <h1 class="logo-title">Primeiro Acesso</h1>
+        <p class="logo-subtitle">Crie uma senha pessoal para continuar</p>
+      </div>
+
+      <div class="card">
+        <!--
+          .alert: caixa de aviso amarela.
+          Mostra instruções importantes sobre a troca de senha.
+        -->
+        <div class="alert alert-warning">
+          <strong>⚠️ Atenção:</strong> Você está usando uma senha provisória. 
+          Por segurança, crie uma nova senha pessoal antes de continuar.
+        </div>
+
+        <h2 class="card-title">Criar nova senha</h2>
+
+        <form id="form-trocar-senha" novalidate>
+          <!--
+            Campo oculto (hidden) que guarda o token JWT do usuário logado.
+            Não aparece na tela, mas o JavaScript lê e envia para o backend.
+          -->
+          <input type="hidden" id="trocar-token">
+
+          <div class="form-group">
+            <label for="trocar-senha-atual" class="form-label">Senha atual (provisória)</label>
+            <input 
+              type="password" 
+              id="trocar-senha-atual" 
+              class="form-input" 
+              placeholder="Digite a senha provisória"
+              required
+            >
+            <span class="error-msg" id="erro-senha-atual">Senha atual é obrigatória</span>
+          </div>
+
+          <div class="form-group">
+            <label for="trocar-nova-senha" class="form-label">Nova senha</label>
+            <input 
+              type="password" 
+              id="trocar-nova-senha" 
+              class="form-input" 
+              placeholder="Mínimo 6 caracteres"
+              required
+              minlength="6"
+            >
+            <!--
+              .hint: dica visual abaixo do campo (cinza claro).
+              Não é erro, é apenas uma sugestão.
+            -->
+            <span class="hint">Use pelo menos 6 caracteres</span>
+            <span class="error-msg" id="erro-nova-senha">Nova senha deve ter no mínimo 6 caracteres</span>
+          </div>
+
+          <div class="form-group">
+            <label for="trocar-confirmar-senha" class="form-label">Confirmar nova senha</label>
+            <input 
+              type="password" 
+              id="trocar-confirmar-senha" 
+              class="form-input" 
+              placeholder="Digite novamente a nova senha"
+              required
+            >
+            <span class="error-msg" id="erro-confirmar-senha">As senhas não coincidem</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-trocar-senha">
+            <span class="btn-text">Salvar nova senha</span>
+            <span class="btn-loading" style="display:none;">
+              <span class="spinner"></span> Salvando...
+            </span>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div> <!-- Fim da #tela-trocar-senha -->
+
+
+  <!-- ========================================================================== -->
+  <!-- TELA 4: CRIAR ADMINISTRADOR (SÓ APARECE SE NÃO EXISTIR ADMIN) -->
+  <!-- ========================================================================== -->
+  <!--
+    id="tela-criar-admin": tela para criar o primeiro administrador.
+    Só aparece quando o sistema é instalado pela primeira vez e
+    não existe nenhum usuário no banco de dados.
+  -->
+  <div id="tela-criar-admin" class="tela">
+    <div class="container">
+      <div class="logo">
+        <div class="logo-icon">👤</div>
+        <h1 class="logo-title">Configuração Inicial</h1>
+        <p class="logo-subtitle">Crie o primeiro administrador do sistema</p>
+      </div>
+
+      <div class="card">
+        <div class="alert alert-info">
+          <strong>ℹ️ Bem-vindo!</strong> Este é o primeiro acesso ao sistema. 
+          Crie uma conta de administrador para começar.
+        </div>
+
+        <h2 class="card-title">Dados do administrador</h2>
+
+        <form id="form-criar-admin" novalidate>
+          <div class="form-group">
+            <label for="admin-nome" class="form-label">Nome completo</label>
+            <input 
+              type="text" 
+              id="admin-nome" 
+              class="form-input" 
+              placeholder="Seu nome completo"
+              required
+            >
+            <span class="error-msg" id="erro-admin-nome">Nome é obrigatório</span>
+          </div>
+
+          <div class="form-group">
+            <label for="admin-email" class="form-label">Email</label>
+            <input 
+              type="email" 
+              id="admin-email" 
+              class="form-input" 
+              placeholder="seu.email@gov.rj"
+              required
+            >
+            <span class="error-msg" id="erro-admin-email">Email válido é obrigatório</span>
+          </div>
+
+          <div class="form-group">
+            <label for="admin-senha" class="form-label">Senha</label>
+            <input 
+              type="password" 
+              id="admin-senha" 
+              class="form-input" 
+              placeholder="Mínimo 8 caracteres"
+              required
+              minlength="8"
+            >
+            <span class="hint">Mínimo 8 caracteres</span>
+            <span class="error-msg" id="erro-admin-senha">Senha deve ter no mínimo 8 caracteres</span>
+          </div>
+
+          <div class="form-group">
+            <label for="admin-confirmar" class="form-label">Confirmar senha</label>
+            <input 
+              type="password" 
+              id="admin-confirmar" 
+              class="form-input" 
+              placeholder="Digite novamente"
+              required
+            >
+            <span class="error-msg" id="erro-admin-confirmar">As senhas não coincidem</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-criar-admin">
+            <span class="btn-text">Criar administrador</span>
+            <span class="btn-loading" style="display:none;">
+              <span class="spinner"></span> Criando...
+            </span>
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div> <!-- Fim da #tela-criar-admin -->
+
+
+  <!-- ========================================================================== -->
+  <!-- MENSAGEM DE NOTIFICAÇÃO (TOAST) -->
+  <!-- ========================================================================== -->
+  <!--
+    id="toast": caixa flutuante que aparece no topo da tela.
+    Usada para mostrar mensagens de sucesso ou erro sem interromper o fluxo.
+    O JavaScript controla quando aparece e some.
+  -->
+  <div id="toast" class="toast" style="display:none;">
+    <span id="toast-mensagem"></span>
+  </div>
+
+
+  <!--
+    =============================================================================
+    SCRIPT EXTERNO - LÓGICA JAVASCRIPT
+    =============================================================================
+    Carrega o arquivo app.js que contém toda a lógica do frontend.
+    O atributo "defer" faz o navegador baixar o JS em paralelo com o HTML,
+    mas só executar DEPOIS que todo o HTML estiver carregado.
+    Isso evita erros de "elemento não encontrado".
+  -->
+  <script src="app.js" defer></script>
+
+</body>
+</html>

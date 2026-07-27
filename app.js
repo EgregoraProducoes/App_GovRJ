@@ -340,44 +340,56 @@ function limparEmailLembrado() {
  * @returns {Promise<Object>} - Promise que resolve com a resposta do servidor
  */
 async function chamarAPI(acao, dados) {
+  // === DEBUG: Loga cada passo da requisição ===
+  console.log("[DEBUG] Iniciando requisição para:", acao);
+  console.log("[DEBUG] API_URL:", API_URL);
+
   // Monta o corpo da requisição
-  // Sempre inclui a ação e um timestamp do cliente (para auditoria)
   var body = {
-    action: acao,                          // Ação que o backend deve executar
-    timestampCliente: new Date().toISOString(),  // Hora do cliente (quando o usuário agiu)
-    ...dados                              // Espalha os dados adicionais recebidos
+    action: acao,
+    timestampCliente: new Date().toISOString(),
+    ...dados
   };
 
+  console.log("[DEBUG] Body da requisição:", body);
+
   try {
-    // fetch() é a API nativa do navegador para fazer requisições HTTP.
-    // await faz a função "esperar" a resposta antes de continuar.
+    console.log("[DEBUG] Enviando fetch...");
+
+    // === IMPORTANTE: Não enviamos Content-Type header ===
+    // Se enviarmos "Content-Type: application/json", o navegador faz um
+    // "preflight request" (OPTIONS) para verificar CORS. O Apps Script
+    // não responde a OPTIONS, então a requisição falha.
+    // Sem o header customizado, o navegador envia POST direto (sem preflight).
     var resposta = await fetch(API_URL, {
-      method: "POST",                      // Método HTTP POST (envia dados no corpo)
-      headers: {
-        "Content-Type": "application/json" // Diz que estamos enviando JSON
-      },
-      body: JSON.stringify(body)           // Converte o objeto para string JSON
+      method: "POST",
+      // mode: "no-cors" NÃO funciona porque bloqueia a leitura da resposta
+      // A solução é simplesmente NÃO enviar headers customizados
+      body: JSON.stringify(body)
     });
 
-    // Verifica se a resposta HTTP foi bem-sucedida (status 200-299)
+    console.log("[DEBUG] Resposta HTTP recebida. Status:", resposta.status);
+    console.log("[DEBUG] Headers da resposta:", [...resposta.headers.entries()]);
+
     if (!resposta.ok) {
+      console.error("[DEBUG] HTTP não-ok:", resposta.status, resposta.statusText);
       throw new Error("Erro na conexão com o servidor (HTTP " + resposta.status + ")");
     }
 
-    // Converte a resposta de JSON (texto) para objeto JavaScript
     var resultado = await resposta.json();
+    console.log("[DEBUG] Resultado JSON:", resultado);
 
-    return resultado;  // Retorna o objeto { success, data, message, error }
+    return resultado;
 
   } catch (erro) {
-    // Se algo deu errado (sem internet, servidor offline, etc)
-    console.error("Erro na API:", erro);  // Mostra no console do desenvolvedor
+    console.error("[DEBUG] ERRO CAPTURADO:", erro);
+    console.error("[DEBUG] Tipo do erro:", erro.name);
+    console.error("[DEBUG] Mensagem:", erro.message);
 
-    // Retorna um objeto de erro padronizado
     return {
       success: false,
       data: null,
-      message: "Erro de conexão. Verifique sua internet e tente novamente.",
+      message: "Erro de conexão. Verifique sua internet e tente novamente. Detalhes: " + erro.message,
       error: "NETWORK_ERROR"
     };
   }
@@ -675,6 +687,7 @@ async function handleTrocarSenha(event) {
  */
 async function handleCriarAdmin(event) {
   event.preventDefault();
+  console.log("[DEBUG] handleCriarAdmin chamado");
   limparErros();
 
   // Lê os valores
